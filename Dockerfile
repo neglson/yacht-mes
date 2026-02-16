@@ -7,7 +7,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 复制应用代码
-COPY backend/ .
+COPY backend/ ./
 
 # 创建上传目录
 RUN mkdir -p /app/uploads
