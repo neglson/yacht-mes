@@ -9,6 +9,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 复制应用代码
 COPY backend/ ./
 
+# 调试：显示目录结构
+RUN ls -la && ls -la app/
+
 # 创建上传目录
 RUN mkdir -p /app/uploads
 
