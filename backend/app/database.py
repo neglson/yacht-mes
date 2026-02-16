@@ -1,43 +1,44 @@
 """
-数据库连接和会话管理
+数据库配置 - 支持 PostgreSQL 和 SQLite
 """
 
-import asyncio
+import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
 
-from app.config import settings
+# 检测环境
+DATABASE_URL = os.getenv("DATABASE_URL", "")
 
-# 创建异步引擎（带重试）
-max_retries = 5
-retry_delay = 5
+# 如果是 Railway 的 PostgreSQL，需要转换协议
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-for attempt in range(max_retries):
-    try:
-        engine = create_async_engine(
-            settings.DATABASE_URL,
-            echo=settings.DEBUG,
-            poolclass=NullPool if settings.DEBUG else None,
-            future=True,
-            connect_args={
-                "command_timeout": 60,
-                "server_settings": {
-                    "jit": "off"
-                }
-            }
-        )
-        print(f"✅ Database engine created successfully")
-        break
-    except Exception as e:
-        print(f"⚠️ Database connection attempt {attempt + 1}/{max_retries} failed: {e}")
-        if attempt < max_retries - 1:
-            asyncio.sleep(retry_delay)
-        else:
-            print(f"❌ Failed to create database engine after {max_retries} attempts")
-            raise
+# 如果没有数据库，使用 SQLite（仅用于测试）
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+    print("⚠️  Using SQLite for testing")
+else:
+    print(f"✅ Using database: {DATABASE_URL.split('@')[0]}@***")
 
-# 异步会话工厂
+# 创建引擎
+if "sqlite" in DATABASE_URL:
+    engine = create_async_engine(
+        DATABASE_URL,
+        echo=False,
+        future=True
+    )
+else:
+    engine = create_async_engine(
+        DATABASE_URL,
+        echo=False,
+        poolclass=NullPool,
+        future=True
+    )
+
+# 会话工厂
 AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
@@ -46,18 +47,4 @@ AsyncSessionLocal = async_sessionmaker(
     autoflush=False
 )
 
-# 声明基类
 Base = declarative_base()
-
-
-async def get_db():
-    """获取数据库会话的依赖函数"""
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
