@@ -1,0 +1,2 @@
+import{_}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{o as l,c,b as t,w as o,i,r as n}from"./index-DejdUQV-.js";const p={},d={class:"page-404"};function u(r,e){const s=n("el-button"),a=n("el-result");return l(),c("div",d,[t(a,{icon:"warning",title:"404","sub-title":"抱歉，您访问的页面不存在"},{extra:o(()=>[t(s,{type:"primary",onClick:e[0]||(e[0]=m=>r.$router.push("/"))},{default:o(()=>[...e[1]||(e[1]=[i("返回首页",-1)])]),_:1})]),_:1})])}const b=_(p,[["render",u],["__scopeId","data-v-1e49837d"]]);export{b as default};
+//# sourceMappingURL=404-BZhd_Tt7.js.map

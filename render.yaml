@@ -1,0 +1,49 @@
+name: yacht-mes
+services:
+  - type: web
+    name: backend
+    runtime: docker
+    repo: https://github.com/neglson/yacht-mes
+    branch: main
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: yacht-mes-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: yacht-mes-redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PORT
+        value: 8000
+    healthCheckPath: /health
+
+  - type: web
+    name: frontend
+    runtime: static
+    repo: https://github.com/neglson/yacht-mes
+    branch: main
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://backend-yacht-mes.onrender.com
+
+  - type: redis
+    name: yacht-mes-redis
+    ipAllowList: []
+
+  - type: pserv
+    name: postgres
+    runtime: docker
+    repo: https://github.com/neglson/yacht-mes
+    branch: main
+    dockerCommand: postgres:15-alpine
+    disk:
+      name: data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 10
