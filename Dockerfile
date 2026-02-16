@@ -1,33 +1,29 @@
-# 阶段1：构建
-FROM python:3.11-slim as builder
+# Yacht MES - 自包含部署配置
+# 使用 SQLite + 内存缓存，无需外部数据库
+
+FROM python:3.11-slim
 
 WORKDIR /app
 
 # 安装依赖
 COPY backend/requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
-
-# 阶段2：运行
-FROM python:3.11-slim
-
-WORKDIR /app
-
-# 从builder复制依赖
-COPY --from=builder /root/.local /root/.local
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 复制应用代码
 COPY backend/app/ ./app/
 
 # 设置环境变量
-ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONPATH=/app
-ENV PORT=8000
+ENV DATABASE_URL=sqlite+aiosqlite:///./data/yacht_mes.db
+ENV REDIS_URL=memory://
+ENV SECRET_KEY=yacht-mes-production-secret-key-2024
+ENV DEBUG=false
 
-# 创建上传目录
-RUN mkdir -p /app/uploads
+# 创建数据目录
+RUN mkdir -p /app/data /app/uploads
 
 # 暴露端口
 EXPOSE 8000
 
-# 启动命令 - 直接使用8000端口
+# 启动命令
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

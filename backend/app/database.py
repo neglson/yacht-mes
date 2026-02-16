@@ -16,12 +16,12 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-# 如果没有数据库，使用 SQLite（仅用于测试）
+# 如果没有数据库，使用 SQLite（生产环境可用）
 if not DATABASE_URL:
-    DATABASE_URL = "sqlite+aiosqlite:///./test.db"
-    print("⚠️  Using SQLite for testing")
+    DATABASE_URL = "sqlite+aiosqlite:///./data/yacht_mes.db"
+    print("⚠️  Using SQLite for production")
 else:
-    print(f"✅ Using database: {DATABASE_URL.split('@')[0]}@***")
+    print(f"✅ Using database")
 
 # 创建引擎
 if "sqlite" in DATABASE_URL:
