@@ -48,3 +48,12 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 Base = declarative_base()
+
+
+# 获取数据库会话
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()
