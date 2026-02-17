@@ -227,6 +227,7 @@ async def dashboard_page():
                 <h2>欢迎使用 Yacht MES 管理系统</h2>
                 <p>铝合金电动游艇建造管理系统 - 让生产更高效、更智能</p>
                 <p style="margin-top: 30px; color: #999;">点击上方菜单开始使用</p>
+                <p style="margin-top: 20px; color: #409EFF; font-size: 12px;">版本: v1.0.1 | 自动更新已启用 ✅</p>
             </div>
         </div>
     </div>
