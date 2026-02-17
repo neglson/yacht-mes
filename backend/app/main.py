@@ -88,10 +88,17 @@ async def root():
             const resultDiv = document.getElementById('result');
             
             try {
+                // 使用 form 格式
+                const formData = new URLSearchParams();
+                formData.append('username', username);
+                formData.append('password', password);
+                
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    headers: { 
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData
                 });
                 
                 const data = await response.json();
@@ -100,7 +107,6 @@ async def root():
                     resultDiv.className = 'success';
                     resultDiv.innerHTML = '✅ 登录成功！<br>Token: ' + data.access_token.substring(0, 30) + '...';
                     resultDiv.style.display = 'block';
-                    // 保存 token
                     localStorage.setItem('token', data.access_token);
                     setTimeout(() => {
                         alert('登录成功！欢迎使用 Yacht MES');
