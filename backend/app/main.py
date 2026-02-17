@@ -134,9 +134,9 @@ async def root():
 </html>"""
 
 
-# 仪表盘页面
+# 仪表盘页面 - 使用不同的函数名避免冲突
 @app.get("/dashboard", response_class=HTMLResponse)
-async def dashboard():
+async def dashboard_page():
     return """<!DOCTYPE html>
 <html>
 <head>
