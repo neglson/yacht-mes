@@ -105,12 +105,14 @@ async def root():
                 
                 if (response.ok) {
                     resultDiv.className = 'success';
-                    resultDiv.innerHTML = '✅ 登录成功！<br>Token: ' + data.access_token.substring(0, 30) + '...';
+                    resultDiv.innerHTML = '✅ 登录成功！正在跳转...';
                     resultDiv.style.display = 'block';
                     localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('username', username);
+                    // 跳转到管理界面
                     setTimeout(() => {
-                        alert('登录成功！欢迎使用 Yacht MES');
-                    }, 500);
+                        window.location.href = '/dashboard';
+                    }, 1000);
                 } else {
                     resultDiv.className = 'error';
                     resultDiv.textContent = '❌ 登录失败: ' + (data.detail || '用户名或密码错误');
@@ -127,6 +129,123 @@ async def root():
         document.getElementById('password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
+    </script>
+</body>
+</html>"""
+
+
+# 仪表盘页面
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Yacht MES 管理仪表盘</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 24px; }
+        .header .user { display: flex; align-items: center; gap: 20px; }
+        .header button { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h3 { color: #666; font-size: 14px; margin-bottom: 10px; }
+        .card .number { font-size: 32px; font-weight: bold; color: #409EFF; }
+        .menu { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+        .menu-item { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.3s; }
+        .menu-item:hover { background: #f5f5f5; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item h4 { color: #333; margin-bottom: 5px; }
+        .menu-item p { color: #999; font-size: 14px; }
+        .content { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px; margin-top: 20px; }
+        .welcome { text-align: center; padding: 60px 20px; }
+        .welcome h2 { color: #333; margin-bottom: 20px; }
+        .welcome p { color: #666; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚢 Yacht MES 管理系统</h1>
+        <div class="user">
+            <span id="username">管理员</span>
+            <button onclick="logout()">退出登录</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="cards">
+            <div class="card">
+                <h3>进行中项目</h3>
+                <div class="number">3</div>
+            </div>
+            <div class="card">
+                <h3>待处理任务</h3>
+                <div class="number">12</div>
+            </div>
+            <div class="card">
+                <h3>库存预警</h3>
+                <div class="number">2</div>
+            </div>
+            <div class="card">
+                <h3>本月采购</h3>
+                <div class="number">¥128万</div>
+            </div>
+        </div>
+        
+        <div class="menu">
+            <div class="menu-item" onclick="alert('项目管理功能开发中')">
+                <h4>📋 项目管理</h4>
+                <p>查看和管理游艇建造项目</p>
+            </div>
+            <div class="menu-item" onclick="alert('任务管理功能开发中')">
+                <h4>📅 任务管理</h4>
+                <p>分配和跟踪生产任务</p>
+            </div>
+            <div class="menu-item" onclick="alert('物料管理功能开发中')">
+                <h4>📦 物料管理</h4>
+                <p>管理原材料和零部件</p>
+            </div>
+            <div class="menu-item" onclick="alert('采购管理功能开发中')">
+                <h4>🛒 采购管理</h4>
+                <p>处理采购订单和供应商</p>
+            </div>
+            <div class="menu-item" onclick="alert('库存管理功能开发中')">
+                <h4>🏭 库存管理</h4>
+                <p>监控仓库库存状态</p>
+            </div>
+            <div class="menu-item" onclick="alert('质量管理功能开发中')">
+                <h4>✅ 质量管理</h4>
+                <p>质量检验和报告</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="welcome">
+                <h2>欢迎使用 Yacht MES 管理系统</h2>
+                <p>铝合金电动游艇建造管理系统 - 让生产更高效、更智能</p>
+                <p style="margin-top: 30px; color: #999;">点击上方菜单开始使用</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 检查登录状态
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        if (!token) {
+            window.location.href = '/';
+        } else {
+            document.getElementById('username').textContent = username || '管理员';
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            window.location.href = '/';
+        }
     </script>
 </body>
 </html>"""
