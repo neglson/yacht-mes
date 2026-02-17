@@ -1,59 +1,50 @@
 """
-数据库配置 - 支持 PostgreSQL 和 SQLite
+数据库配置 - 兼容 Python 3.6 + SQLAlchemy 1.4
 """
 
 import os
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.pool import NullPool
 
 # 检测环境
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
-# 如果是 Railway 的 PostgreSQL，需要转换协议
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
-elif DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
-
-# 如果没有数据库，使用 SQLite（生产环境可用）
+# 如果没有数据库，使用 SQLite
 if not DATABASE_URL:
-    DATABASE_URL = "sqlite+aiosqlite:///./data/yacht_mes.db"
-    print("⚠️  Using SQLite for production")
+    DATABASE_URL = "sqlite:///./data/yacht_mes.db"
+    print("Using SQLite")
 else:
-    print(f"✅ Using database")
+    print("Using database")
 
-# 创建引擎
+# 创建引擎（同步模式，兼容 Python 3.6）
 if "sqlite" in DATABASE_URL:
-    engine = create_async_engine(
+    engine = create_engine(
         DATABASE_URL,
         echo=False,
-        future=True
+        connect_args={"check_same_thread": False}
     )
 else:
-    engine = create_async_engine(
+    engine = create_engine(
         DATABASE_URL,
         echo=False,
-        poolclass=NullPool,
-        future=True
+        poolclass=NullPool
     )
 
 # 会话工厂
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
+SessionLocal = sessionmaker(
     autocommit=False,
-    autoflush=False
+    autoflush=False,
+    bind=engine
 )
 
 Base = declarative_base()
 
 
 # 获取数据库会话
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

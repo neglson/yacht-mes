@@ -6,31 +6,16 @@ Yacht MES - FastAPI Backend
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.database import engine, Base
 from app.routers import auth, users, projects, tasks, materials, procurement, inventory, attachments, ai, dashboard, import_data, notifications, audit
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """应用生命周期管理"""
-    # 启动时执行
-    async with engine.begin() as conn:
-        # 开发环境下自动创建表，生产环境使用 Alembic 迁移
-        # await conn.run_sync(Base.metadata.create_all)
-        pass
-    yield
-    # 关闭时执行
-    await engine.dispose()
-
-
 app = FastAPI(
     title="Yacht MES API",
     description="铝合金电动游艇建造管理系统",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.0.0"
 )
 
 # CORS 配置
