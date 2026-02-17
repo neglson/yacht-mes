@@ -1,24 +1,24 @@
 """
-配置管理
+配置管理 - 兼容 Python 3.6
 """
 
-from pydantic_settings import BaseSettings
+import os
 from typing import List
 
 
-class Settings(BaseSettings):
+class Settings:
     # 应用配置
     APP_NAME: str = "Yacht MES"
-    DEBUG: bool = True
+    DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
     
     # 数据库配置
-    DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost/yacht_mes"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./data/yacht_mes.db")
     
     # Redis 配置
-    REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     
     # JWT 配置
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 小时
     
@@ -27,24 +27,22 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://localhost:8080",
         "http://localhost:5173",
+        "http://8.138.151.143:8080",
     ]
     
     # MinIO 配置
-    MINIO_ENDPOINT: str = "localhost:9000"
-    MINIO_ACCESS_KEY: str = "minioadmin"
-    MINIO_SECRET_KEY: str = "minioadmin"
-    MINIO_BUCKET_NAME: str = "yacht-mes"
+    MINIO_ENDPOINT: str = os.getenv("MINIO_ENDPOINT", "localhost:9000")
+    MINIO_ACCESS_KEY: str = os.getenv("MINIO_ACCESS_KEY", "minioadmin")
+    MINIO_SECRET_KEY: str = os.getenv("MINIO_SECRET_KEY", "minioadmin")
+    MINIO_BUCKET_NAME: str = os.getenv("MINIO_BUCKET_NAME", "yacht-mes")
     
     # Kimi API 配置
-    KIMI_API_KEY: str = ""
-    KIMI_API_BASE: str = "https://api.moonshot.cn/v1"
+    KIMI_API_KEY: str = os.getenv("KIMI_API_KEY", "")
+    KIMI_API_BASE: str = os.getenv("KIMI_API_BASE", "https://api.moonshot.cn/v1")
     
     # 文件上传配置
     MAX_FILE_SIZE: int = 100 * 1024 * 1024  # 100MB
     UPLOAD_DIR: str = "./uploads"
-    
-    class Config:
-        env_file = ".env"
 
 
 settings = Settings()
