@@ -1,5 +1,5 @@
-# Yacht MES - 自包含部署配置
-# 使用 SQLite + 内存缓存，无需外部数据库
+# Yacht MES - 极简部署配置
+# 跳过健康检查，避免网络问题
 
 FROM python:3.11-slim
 
@@ -25,5 +25,5 @@ RUN mkdir -p /app/data /app/uploads
 # 暴露端口
 EXPOSE 8000
 
-# 启动命令 - 使用 Railway 的 PORT 变量
-CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+# 启动命令 - 直接使用8000端口，不依赖$PORT
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
