@@ -196,27 +196,27 @@ async def dashboard_page():
         </div>
         
         <div class="menu">
-            <div class="menu-item" onclick="alert('项目管理功能开发中')">
+            <div class="menu-item" onclick="location.href='/projects'">
                 <h4>📋 项目管理</h4>
                 <p>查看和管理游艇建造项目</p>
             </div>
-            <div class="menu-item" onclick="alert('任务管理功能开发中')">
-                <h4>📅 任务管理</h4>
-                <p>分配和跟踪生产任务</p>
+            <div class="menu-item" onclick="location.href='/gantt'">
+                <h4>📅 甘特图</h4>
+                <p>项目进度时间轴视图</p>
             </div>
-            <div class="menu-item" onclick="alert('物料管理功能开发中')">
+            <div class="menu-item" onclick="location.href='/materials'">
                 <h4>📦 物料管理</h4>
                 <p>管理原材料和零部件</p>
             </div>
-            <div class="menu-item" onclick="alert('采购管理功能开发中')">
+            <div class="menu-item" onclick="location.href='/procurement'">
                 <h4>🛒 采购管理</h4>
                 <p>处理采购订单和供应商</p>
             </div>
-            <div class="menu-item" onclick="alert('库存管理功能开发中')">
+            <div class="menu-item" onclick="location.href='/inventory'">
                 <h4>🏭 库存管理</h4>
                 <p>监控仓库库存状态</p>
             </div>
-            <div class="menu-item" onclick="alert('质量管理功能开发中')">
+            <div class="menu-item" onclick="location.href='/quality'">
                 <h4>✅ 质量管理</h4>
                 <p>质量检验和报告</p>
             </div>
@@ -227,7 +227,7 @@ async def dashboard_page():
                 <h2>欢迎使用 Yacht MES 管理系统</h2>
                 <p>铝合金电动游艇建造管理系统 - 让生产更高效、更智能</p>
                 <p style="margin-top: 30px; color: #999;">点击上方菜单开始使用</p>
-                <p style="margin-top: 20px; color: #409EFF; font-size: 12px;">版本: v1.0.1 | 自动更新已启用 ✅</p>
+                <p style="margin-top: 20px; color: #409EFF; font-size: 12px;">版本: v1.1.0 | 已更新甘特图功能 ✅</p>
             </div>
         </div>
     </div>
@@ -248,6 +248,84 @@ async def dashboard_page():
             window.location.href = '/';
         }
     </script>
+</body>
+</html>"""
+
+
+# 甘特图页面
+@app.get("/gantt", response_class=HTMLResponse)
+async def gantt_page():
+    return """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>甘特图 - Yacht MES</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 24px; }
+        .header button { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .gantt-chart { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; overflow-x: auto; }
+        .gantt-row { display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .gantt-label { width: 200px; font-weight: bold; }
+        .gantt-bar-container { flex: 1; height: 30px; background: #f5f5f5; border-radius: 4px; position: relative; }
+        .gantt-bar { height: 100%; border-radius: 4px; position: absolute; }
+        .completed { background: #52c41a; }
+        .in-progress { background: #1890ff; }
+        .pending { background: #d9d9d9; }
+        .legend { display: flex; gap: 20px; margin-bottom: 20px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 20px; height: 20px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📅 甘特图</h1>
+        <button onclick="location.href='/dashboard'">返回仪表盘</button>
+    </div>
+    
+    <div class="container">
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:#52c41a"></div>已完成</div>
+            <div class="legend-item"><div class="legend-color" style="background:#1890ff"></div>进行中</div>
+            <div class="legend-item"><div class="legend-color" style="background:#d9d9d9"></div>待开始</div>
+        </div>
+        
+        <div class="gantt-chart">
+            <div class="gantt-row">
+                <div class="gantt-label">1.1 船体结构设计</div>
+                <div class="gantt-bar-container">
+                    <div class="gantt-bar completed" style="left:0%;width:30%"></div>
+                </div>
+            </div>
+            <div class="gantt-row">
+                <div class="gantt-label">1.2 铝合金材料采购</div>
+                <div class="gantt-bar-container">
+                    <div class="gantt-bar in-progress" style="left:25%;width:40%"></div>
+                </div>
+            </div>
+            <div class="gantt-row">
+                <div class="gantt-label">2.1 船体焊接</div>
+                <div class="gantt-bar-container">
+                    <div class="gantt-bar pending" style="left:60%;width:35%"></div>
+                </div>
+            </div>
+            <div class="gantt-row">
+                <div class="gantt-label">2.2 舾装件安装</div>
+                <div class="gantt-bar-container">
+                    <div class="gantt-bar pending" style="left:70%;width:25%"></div>
+                </div>
+            </div>
+            <div class="gantt-row">
+                <div class="gantt-label">3.1 电气系统安装</div>
+                <div class="gantt-bar-container">
+                    <div class="gantt-bar pending" style="left:80%;width:20%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>"""
 
